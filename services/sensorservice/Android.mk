@@ -2,7 +2,6 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
-	BatteryService.cpp \
 	CorrectedGyroSensor.cpp \
     Fusion.cpp \
     GravitySensor.cpp \
@@ -15,9 +14,18 @@ LOCAL_SRC_FILES:= \
     SensorInterface.cpp \
     SensorService.cpp
 
+ifneq ($(TARGET_CAMERA_USES_SENSORSERVICE_HACK),true)
+LOCAL_SRC_FILES += \
+    BatteryService.cpp
+endif
+
 LOCAL_CFLAGS:= -DLOG_TAG=\"SensorService\"
 
 LOCAL_CFLAGS += -fvisibility=hidden
+
+ifeq ($(TARGET_CAMERA_USES_SENSORSERVICE_HACK),true)
+LOCAL_CFLAGS += -DCAMERA_USES_SENSORSERVICE_HACK
+endif
 
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \

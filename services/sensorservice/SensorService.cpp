@@ -40,7 +40,9 @@
 #include <hardware/sensors.h>
 #include <hardware_legacy/power.h>
 
+#ifndef CAMERA_USES_SENSORSERVICE_HACK
 #include "BatteryService.h"
+#endif
 #include "CorrectedGyroSensor.h"
 #include "GravitySensor.h"
 #include "LinearAccelerationSensor.h"
@@ -549,7 +551,9 @@ void SensorService::cleanupConnection(SensorEventConnection* c)
         }
     }
     mActiveConnections.remove(connection);
+#ifndef CAMERA_USES_SENSORSERVICE_HACK
     BatteryService::cleanup(c->getUid());
+#endif
 }
 
 status_t SensorService::enable(const sp<SensorEventConnection>& connection,
@@ -587,7 +591,9 @@ status_t SensorService::enable(const sp<SensorEventConnection>& connection,
     }
 
     if (connection->addSensor(handle)) {
+#ifndef CAMERA_USES_SENSORSERVICE_HACK
         BatteryService::enableSensor(connection->getUid(), handle);
+#endif
         // the sensor was added (which means it wasn't already there)
         // so, see if this connection becomes active
         if (mActiveConnections.indexOf(connection) < 0) {
@@ -661,10 +667,12 @@ status_t SensorService::cleanupWithoutDisableLocked(
         const sp<SensorEventConnection>& connection, int handle) {
     SensorRecord* rec = mActiveSensors.valueFor(handle);
     if (rec) {
+#ifndef CAMERA_USES_SENSORSERVICE_HACK
         // see if this connection becomes inactive
         if (connection->removeSensor(handle)) {
             BatteryService::disableSensor(connection->getUid(), handle);
         }
+#endif
         if (connection->hasAnySensor() == false) {
             mActiveConnections.remove(connection);
         }
